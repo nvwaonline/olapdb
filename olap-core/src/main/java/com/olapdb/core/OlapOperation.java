@@ -4,9 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum OlapOperation {
-    ADD     (0,"ADD"),      //创建
-    REMOVE  (1,"REMOVE"),   //清除
-//    UPDATE  (2,"UPDATE"),   //更新
+    ADD     (0,"ADD"),
+    REMOVE  (1,"REMOVE"),
     ;
 
     private OlapOperation(int code, String name) {

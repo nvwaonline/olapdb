@@ -44,7 +44,7 @@ public class Olap {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        //如果指定时间维度，把时间维度用层级时间维度组替换
+        //If a time dimension is specified, replace the time dimension with a hierarchical time dimension group
         ///////////////////////////////////////////////////////////////////////////////////////////
         String timeDim = cube.getTimeDimension();
         String timeDimType = timeDim.isEmpty()?null:cube.getDimensionType(timeDim);
