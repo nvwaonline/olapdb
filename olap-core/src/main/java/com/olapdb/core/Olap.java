@@ -28,8 +28,8 @@ public class Olap {
 
     /**
      * submit precompiled segment to olap database
-     * @param cubeName
-     * @param facts
+     * @param cubeName, cube name
+     * @param facts, fact list
      * @throws Exception
      */
     public static void submitSegment(String cubeName, List<String> facts) throws Exception {
@@ -66,31 +66,19 @@ public class Olap {
         long segId = WorkingAreaManager.allocateSegmentId();
 
         try{
-            /**
-             * 释放memstore 清理工作区头
-             */
             DwUtil.execFlushSegment(segId);
 
-            /**
-             * 构建segment
-             */
             segment = Segment.newInstance(cube, SegmentLevel.LEVEL_0, segId);
             segment.setType(SegmentType.BUILD);
             segment.setPhase(SegmentPhase.CREATED);
             segment.setFactCount(facts.size());
             segment.connect();
 
-            /**
-             * 在数据库中添加增量构建任务
-             */
             job = SegBuildTask.newInstance(segment);
             job.setPhase(TaskPhase.CREATED);
             job.setStartTime(System.currentTimeMillis());
             job.connect();
 
-            /**
-             * 加载Cube的顶层Cuboid
-             */
             List<String> sortedDimList = cube.getDimensionList();
 
             String cuboidName = cube.getIdenticalName() + ":" + DwUtil.unify(sortedDimList, cube.getIndexDimensionList());
@@ -127,9 +115,6 @@ public class Olap {
 
                     List<Object> jsonArray = new ArrayList<>(sortedDimList.size() +1);
                     for (String dim : sortedDimList) {
-                        /**
-                         * 如果有用到OLAP_OPERATION作为维度，数据中不存在此项时添加默认值add
-                         */
                         if (OlapOperation.getKey().equals(dim) && !jo.containsKey(OlapOperation.getKey())) {
                             jsonArray.add(OlapOperation.ADD.getName());
                         } else {
@@ -166,10 +151,6 @@ public class Olap {
                 throw new Exception("data process failed", exceptionReference.get());
             }
 
-
-            /**
-             * 清理掉互相抵消的
-             */
             voxelMap.entrySet().removeIf(e->!e.getValue().valid());
 
             if(voxelMap.isEmpty())throw new Exception("Build failed. voxelMap is Empty.");
@@ -187,9 +168,6 @@ public class Olap {
             else
                 segment.setEldestDataBirthTime(System.currentTimeMillis());
 
-            /**
-             * 释放memstore 清理工作区尾
-             */
             DwUtil.execFlushSegment(segment);
             job.setPhase(TaskPhase.PREPARED);
 
@@ -251,14 +229,6 @@ public class Olap {
         }catch (Exception e){}
     }
 
-
-    /**
-     * 缩减Fact表
-     *
-     * 如果Fact表的region数超过64个，本方法会对Fact表中连续的空Region进行合并。
-     *
-     * @throws Exception
-     */
     private static void thrinkFactTable() throws Exception {
         List<HRegionLocation> regionLocations = Obase.getRegionsInRange(Fact.class, null, HConstants.EMPTY_END_ROW, false,false);
 

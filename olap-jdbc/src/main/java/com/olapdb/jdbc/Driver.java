@@ -28,49 +28,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Set;
 
-/**
- * <p>
- * Kylin JDBC Driver based on Calcite Avatica and Kylin restful API.<br>
- * Supported versions:
- * </p>
- * <ul>
- * <li>jdbc 4.0</li>
- * <li>jdbc 4.1</li>
- * </ul>
- *
- * <p>
- * Supported Statements:
- * </p>
- * <ul>
- * <li>{@link OlapStatement}</li>
- * <li>{@link OlapPreparedStatement}</li>
- * </ul>
- *
- * <p>
- * Supported properties:
- * <ul>
- * <li>user: username</li>
- * <li>password: password</li>
- * <li>ssl: true/false</li>
- * <li>{@link #CLIENT_CALCITE_PROP_NAMES extras calcite props} like: caseSensitive, unquotedCasing, quoting, conformance</li>
- * </ul>
- * </p>
- *
- * <p>
- * Driver init code sample:<br>
- *
- * <pre>
- * Driver driver = (Driver) Class.forName(&quot;org.apache.kylin.kylin.jdbc.Driver&quot;).newInstance();
- * Properties info = new Properties();
- * info.setProperty(&quot;user&quot;, &quot;user&quot;);
- * info.setProperty(&quot;password&quot;, &quot;password&quot;);
- * info.setProperty(&quot;ssl&quot;, &quot;true&quot;);
- * info.setProperty(&quot;caseSensitive&quot;, &quot;true&quot;);
- * Connection conn = driver.connect(&quot;jdbc:kylin://{domain}/{project}&quot;, info);
- * </pre>
- *
- * </p>
- */
 public class Driver extends UnregisteredDriver {
 
     public static final String CONNECT_STRING_PREFIX = "jdbc:olap:";

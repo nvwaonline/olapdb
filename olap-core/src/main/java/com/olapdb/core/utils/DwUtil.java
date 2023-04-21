@@ -25,17 +25,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DwUtil{
     public static List<String> timeSortDims(List<String> dims, List<String> entityDims){
-        /**
-         * 对维度序列做时间维度提前按时间粒度排序，其他维度按字符顺序排序
-         * 时间维度 OLAP_YEAR,OLAP_MONTH,OLAP_DAY,OLAP_HOUR,OLAP_MINUTE,OLAP_SECOND,OLAP_MILLISECOND是保留维度名称，放在维度组合的最前面
-         * @return
-         */
         List<String> orderDims = new Vector<>(dims);
         Collections.sort(orderDims);
 
-        /**
-         * entityDim提前 这样无时间列、有实体列时能自动转换从可以实体索引的列
-         */
         if(entityDims != null && !entityDims.isEmpty()){
             for(int i= entityDims.size()-1; i>=0; i--){
                 String entityDim = entityDims.get(i);
@@ -125,7 +117,7 @@ public class DwUtil{
             try {
                 value = jsonObject.getDoubleValue(measure);
             }catch (Exception e){
-                log.info("从事实数据【{}】中提取度量字段【{}】失败， 默认使用0代替", jsonObject, measure);
+                log.info("field {} {} faild replaced by 0", jsonObject, measure);
                 value = 0;
             }
             singleMeasureStat.setMax((float) value);
@@ -228,7 +220,6 @@ public class DwUtil{
         }
     }
 
-    //收集集群服务器信息
     public static void execFlushSegment(Segment segment){
         execFlushSegment(segment.getId());
     }
@@ -249,7 +240,6 @@ public class DwUtil{
         }
     }
 
-    //紧缩 segment
     public static void compactSegment(Segment segment) {
         compactSegment(segment.getId());
     }
@@ -318,7 +308,6 @@ public class DwUtil{
     }
 
 
-    //远程执行分片组合任务
     private static boolean executeSegCombineTask(SegCombineTask job)throws Exception {
         byte[] startRow = Bytez.from(job.getSegId());
 
@@ -336,7 +325,6 @@ public class DwUtil{
         return Util.execRegionOperation(Voxel.class, startRow, "killCombineSegment", paras);
     }
 
-    //远程检测分片组合任务是否正在执行
     private static boolean segCombineTaskIsStillRunning(SegCombineTask job)throws Exception {
         byte[] startRow = Bytez.from(job.getSegId());
 
@@ -346,13 +334,7 @@ public class DwUtil{
         return Util.execRegionOperation(Voxel.class, startRow, "execSegCombineJobIsStillRunning", paras);
     }
 
-    //远程执行分片组合任务
     private static boolean executeSegMendTask(SegMendTask job)throws Exception {
-        /**
-         * 随机选择执行分区
-         */
-//        byte partid = (byte)(Voxel.PARTION_COUNT * Math.random());
-
         byte[] startRow = Bytez.from(job.getSegId());
 
         Map<String, String> paras = new HashMap<>();
@@ -362,11 +344,6 @@ public class DwUtil{
     }
 
     private static boolean killSegMendTask(SegMendTask job)throws Exception {
-        /**
-         * 随机选择执行分区
-         */
-//        byte partid = (byte)(Voxel.PARTION_COUNT * Math.random());
-
         byte[] startRow = Bytez.from(job.getSegId());
 
         Map<String, String> paras = new HashMap<>();
@@ -375,7 +352,6 @@ public class DwUtil{
         return Util.execRegionOperation(Voxel.class, startRow, "killAddCuboid", paras);
     }
 
-    //远程检测分片构建任务是否正在执行
     private static boolean segMendTaskIsStillRunning(SegMendTask job)throws Exception {
         byte[] startRow = Bytez.from(job.getSegId());
 
@@ -388,11 +364,7 @@ public class DwUtil{
         return false;
     }
 
-    //远程执行分片构建任务
     private static boolean executeSegBuildTask(SegBuildTask job)throws Exception {
-        /**
-         * 随机选择执行分区
-         */
         byte[] startRow = Bytez.from(job.getSegId());
 
         Map<String, String> paras = new HashMap<>();
@@ -401,9 +373,6 @@ public class DwUtil{
         return Util.execRegionOperation(Voxel.class, startRow, "execSegBuild", paras);
     }
     private static boolean killSegBuildTask(SegBuildTask job)throws Exception {
-        /**
-         * 随机选择执行分区
-         */
         byte[] startRow = Bytez.from(job.getSegId());
 
         Map<String, String> paras = new HashMap<>();
@@ -412,7 +381,6 @@ public class DwUtil{
         return Util.execRegionOperation(Voxel.class, startRow, "killSegBuild", paras);
     }
 
-    //远程检测分片构建任务是否正在执行
     private static boolean segBuildTaskIsStillRunning(SegBuildTask job)throws Exception {
         byte[] startRow = Bytez.from(job.getSegId());
 
@@ -425,7 +393,6 @@ public class DwUtil{
         return false;
     }
 
-    //收集集群服务器信息
     public static String execCollectInfo(HRegionLocation location){
         Map<String, String> paras = new HashMap<>();
         String info = "";
@@ -438,7 +405,6 @@ public class DwUtil{
         return info;
     }
 
-    //合并region
     public static boolean checkVoxelRegionEmpty(RegionInfo regionInfo) {
         try {
             Scan scan = new Scan().withStartRow(regionInfo.getStartKey()).withStopRow(regionInfo.getEndKey());
@@ -458,12 +424,6 @@ public class DwUtil{
         }
     }
 
-    /**
-     * 扫描一个voxel region中的数据来自哪些 segment
-     *
-     * @param regionInfo
-     * @return
-     */
     public static List<Long> scanVoxelRegionSegmentIds(RegionInfo regionInfo) {
         List<Long> segmentIds = new Vector<>();
         try {
@@ -507,7 +467,7 @@ public class DwUtil{
         for (Segment segment : segments) {
             for (Cuboid cuboid : cuboids) {
                 if (segment.getVoxelCount(cuboid.getId()) <= 0) {
-                    log.info("为什么会有聚合数为0呢？ segid = {} cuboid id = {} item count={}", segment.getId(), cuboid.getId(), segment.getVoxelCount(cuboid.getId()));
+                    log.info("is it correct? segid = {} cuboid id = {} item count={}", segment.getId(), cuboid.getId(), segment.getVoxelCount(cuboid.getId()));
                 }
             }
         }
@@ -515,13 +475,6 @@ public class DwUtil{
         return true;
     }
 
-
-    /**
-     * 放宽查询要求 要求所有的couples都会成对出现
-     * @param cube
-     * @param dims
-     * @return
-     */
     public static List<String> looseQueryDimentionsManual(Cube cube, List<String> dims){
         Cuboid cuboid = new Cuboid(cube.getIdenticalName() +":"+ DwUtil.unify(dims, cube.getIndexDimensionList()));
         if(!cuboid.needConnect() && cuboid.getPhase() == CuboidPhase.PRODUCTIVE)
@@ -535,9 +488,6 @@ public class DwUtil{
         Set<String> looseSet = new HashSet<>();
         looseSet.addAll(dims);
 
-        /**
-         * 层级维度优化
-         */
         for(List<String> hirDims : cube.getHierachyDimensionList()){
             for(int i=hirDims.size()-1; i>=0; i--){
                 if(looseSet.contains(hirDims.get(i))){
@@ -547,9 +497,6 @@ public class DwUtil{
             }
         }
 
-        /**
-         * 联合维度优化
-         */
         for(List<String> jointDims : cube.getJointDimensionList()){
             for(String cdim : jointDims){
                 if(looseSet.contains(cdim)){
@@ -559,9 +506,6 @@ public class DwUtil{
             }
         }
 
-        /**
-         * 强制维度优化
-         */
         for(String manDims : cube.getMandatoryDimensionList()){
             looseSet.add(manDims);
         }

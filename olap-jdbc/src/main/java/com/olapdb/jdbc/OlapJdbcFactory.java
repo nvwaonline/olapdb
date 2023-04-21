@@ -28,9 +28,6 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
 
-/**
- * Kylin JDBC factory.
- */
 public class OlapJdbcFactory implements JdbcFactory {
 
     public static class Version40 extends OlapJdbcFactory {
@@ -48,7 +45,6 @@ public class OlapJdbcFactory implements JdbcFactory {
     final int major;
     final int minor;
 
-    /** Creates a JDBC factory with given major/minor version number. */
     protected OlapJdbcFactory(int major, int minor) {
         this.major = major;
         this.minor = minor;

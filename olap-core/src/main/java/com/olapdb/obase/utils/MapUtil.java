@@ -3,12 +3,6 @@ package com.olapdb.obase.utils;
 import java.util.Map;
 
 public class MapUtil {
-    /**
-     * 两个一层集合相加
-     * @param a
-     * @param b
-     * @return
-     */
     public static Map<String, Integer> addToMap1(
             Map<String, Integer> a,
             Map<String, Integer> b){
@@ -19,12 +13,6 @@ public class MapUtil {
         return a;
     }
 
-    /**
-     * 两个两层集合相加
-     * @param a
-     * @param b
-     * @return
-     */
     public static Map<String, Map<String, Integer>> addToMap2(
             Map<String, Map<String, Integer>> a,
             Map<String, Map<String, Integer>> b){

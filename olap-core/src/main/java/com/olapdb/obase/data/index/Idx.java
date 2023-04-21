@@ -14,10 +14,6 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * 主要用于统计索引值出现的次数
- * @author Victor.Shaw
- */
 public class Idx extends ReferenceEntity implements Comparable<Idx>{
 	@SuppressWarnings("unused")
 	private final static String tableName = "olapdb:idx";
@@ -53,25 +49,15 @@ public class Idx extends ReferenceEntity implements Comparable<Idx>{
 		return Bytez.toString(this.getRow());
 	}
 
-	/**
-	 * 获取标签相关索引行
-	 * @return 索引行列表
-	 */
 	public Stream<IndexData> stream(){
 		byte[] irow = this.getRow();
 		Scan scan = new Scan().withStartRow(irow).withStopRow(Bytez.next(irow));
-
-//        byte[] row = Bytes.copy(r.getRow(),irow.length,r.getRow().length-irow.length);
 
 		return Index.stream(scan).map(e->new IndexData(
                 Bytes.copy(e.getRow(),irow.length,e.getRow().length-irow.length),
 		        e.getData()));
 	}
 
-	/**
-	 * 获取标签相关索引行
-	 * @return 索引行列表
-	 */
 	public List<Find> getIndexRows(){
 		byte[] irow = this.getRow();
 
@@ -98,11 +84,6 @@ public class Idx extends ReferenceEntity implements Comparable<Idx>{
 		return rows;
 	}
 
-	/**
-	 * 计算给定的行集合和标签的行集合的交集
-	 * @param rows
-	 * @return
-	 */
 	public List<Find> filterIndexRows(List<Find> rows){
 		byte[] irow = this.getRow();
 

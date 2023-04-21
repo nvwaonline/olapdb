@@ -24,27 +24,24 @@ public class Obase {
 
 	public static String SERVER = "";
 
-	//通用的列簇名称
-	public final static String FAMILY_ATTR = "A"; //attributes 属性 对象的基本属性
-	public final static String FAMILY_EXEC = "E"; //execute 命令执行 row, method, para
-	public final static String FAMILY_EXEC_REGION = "R"; //execute 执行region操作命令
+	public final static String FAMILY_ATTR = "A"; //attributes
+	public final static String FAMILY_EXEC = "E"; //execute
+	public final static String FAMILY_EXEC_REGION = "R"; //execute
 
 	public final static String COLUMN_REFERENCE = "reference";
 	public final static String COLUMN_ID = "id";
 
-	//全局表
-	private final static String TABLE_INCREMENT = "olapdb:increment"; //全局表
-	private final static String TABLE_IDCS	  	= "olapdb:idc"; //列表，每个列值分配一个long cid; row组成：table|column
-	private final static String TABLE_IDXS	  	= "olapdb:idx"; //标签表，row组成：cid|value.ranking
-	private final static String TABLE_INDEXS  	= "olapdb:index"; //索引表，row组成：cid|value.ranking|row;
-	//data域：null 或者 count/total用于全文索引权重计算
+	private final static String TABLE_INCREMENT = "olapdb:increment";
+	private final static String TABLE_IDCS	  	= "olapdb:idc";
+	private final static String TABLE_IDXS	  	= "olapdb:idx";
+	private final static String TABLE_INDEXS  	= "olapdb:index";
 
 	private static Connection conn;
 	private static String Namespace = "";
 	private static boolean Restrict= true;
 
-	public static boolean Debug = false; //调试
-	public static boolean DebugIndex = false; //索引调试
+	public static boolean Debug = false;
+	public static boolean DebugIndex = false;
 
 //	private final static Algorithm DefaultAlgorithm = null;
 	private final static Algorithm DefaultAlgorithm = Algorithm.LZ4;
@@ -227,9 +224,6 @@ public class Obase {
 		admin.createTable(desc, splits);
 	}
 
-	/**
-	 * 获取obase唯一标志。如果不存在，则创建
-	 */
 	public static String olapObaseIdentify = "";
 	public synchronized static String getIdentify(){
 		if(olapObaseIdentify == null || olapObaseIdentify.isEmpty()) {
@@ -241,11 +235,6 @@ public class Obase {
 		return olapObaseIdentify;
 	}
 
-	/**
-	 * 删除一个命名空间中的所有表格
-	 * @param ns，命名空间
-	 * @throws IOException
-	 */
 	public static void clearNamespaceAnyway(String ns) throws IOException {
 		Admin admin = Obase.getConnection().getAdmin();
 		for(TableName tn : admin.listTableNames()){
@@ -281,7 +270,6 @@ public class Obase {
 		deleteTable(tName);
 
 		HTableDescriptor desc=new HTableDescriptor(tName);
-		//添加列簇  f, 存储文档信息
 		HColumnDescriptor hcd = new HColumnDescriptor(Obase.FAMILY_ATTR);//doc
 		hcd.setMaxVersions(maxVersions);
 		hcd.setInMemory(inMemory);
@@ -331,32 +319,16 @@ public class Obase {
 		}
 	}
 
-	/**
-	 * 列出所有namespace
-	 * @return
-	 * @throws IOException
-	 */
 	public static void createNamespace(String name) throws IOException {
 		NamespaceDescriptor.Builder builder = NamespaceDescriptor.create(name);
 		conn.getAdmin().createNamespace(builder.build());
 	}
 
-	/**
-	 * 列出所有namespace
-	 * @return
-	 * @throws IOException
-	 */
 	public static NamespaceDescriptor[] listNamespace() throws IOException {
 		NamespaceDescriptor[] list = conn.getAdmin().listNamespaceDescriptors();
 		return list;
 	}
 
-	/**
-	 * 判断一个namespace是否存在
-	 * @param namespace
-	 * @return
-	 * @throws IOException
-	 */
 	public static boolean existsNamespace(String namespace) throws IOException {
 		for (NamespaceDescriptor namespaceDescriptor : listNamespace()) {
 			if (namespaceDescriptor.getName().equals(namespace)) {
@@ -409,7 +381,7 @@ public class Obase {
 					Obase.getTable(K).put(puts);
 				} catch (Exception e) {
 					e.printStackTrace();
-					throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+					throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 				}
 			}
 		});
@@ -444,7 +416,7 @@ public class Obase {
 					Obase.getTable(K).delete(deletes);
 				} catch (Exception e) {
 					e.printStackTrace();
-					throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+					throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 				}
 			}
 		});
@@ -481,7 +453,7 @@ public class Obase {
 					.collect(Collectors.toList());
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e1);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e1);
 		}
 	}
 
@@ -490,7 +462,7 @@ public class Obase {
 			Obase.getTable(entityClass).delete(deletes);
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e1);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e1);
 		}
 	}
 

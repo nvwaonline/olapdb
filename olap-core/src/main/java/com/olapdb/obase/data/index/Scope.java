@@ -27,10 +27,6 @@ public class Scope {
 		this.stop = stop;
 	}
 
-	/**
-	 * 获取标签相关索引行
-	 * @return 索引行列表
-	 */
 	public List<Find> getIndexRows(){
 		Scan scan = new Scan(Bytez.add(Bytez.from(idc.getId()), start.ranking()), Bytez.add(Bytez.from(idc.getId()), stop.ranking()));
 
@@ -83,12 +79,6 @@ public class Scope {
 
 	}
 
-
-	/**
-	 * 计算给定的行集合和标签的行集合的交集
-	 * @param rows
-	 * @return
-	 */
 	public List<Find> filterIndexRows(List<Find> rows){
 		if(idc == null || idc.getRefColumn() == null || idc.getRefTable() == null)
 			return new Vector<Find>();
@@ -124,12 +114,6 @@ public class Scope {
 		return rets;
 	}
 
-
-	/**
-	 * 计算给定的行集合和标签的行集合的交集
-	 * @param rows
-	 * @return
-	 */
 	public List<Find> filterIndexRows_byScan(List<Find> rows){
 		Scan scan = new Scan(Bytez.add(Bytez.from(idc.getId()), start.ranking()), Bytez.add(Bytez.from(idc.getId()), stop.ranking()));
 
@@ -156,11 +140,9 @@ public class Scope {
 			Cell c = r.getColumnLatestCell(Bytez.from(Obase.FAMILY_ATTR), Bytez.from("data"));
 			if(c != null){
 				switch(type){
-				//固定长度
 				case Value.Type_Boolean:
 					len += 0;
 					break;
-					//固定符号
 				case Value.Type_Byte:
 				case Value.Type_Short:
 				case Value.Type_Int:
@@ -170,7 +152,6 @@ public class Scope {
 					len += 1;
 					break;
 
-					//可变长度
 				case Value.Type_String:
 				case Value.Type_Bytes:
 					len = 4 + 2 + Bytez.toShort(r.getRow(),4);

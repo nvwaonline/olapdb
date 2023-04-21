@@ -38,30 +38,11 @@ public class ParallelScanner extends AbstractClientScanner {
     private volatile IOException exception;
 
 
-    /**
-     * Create a new parallel scanner.
-     *
-     * @param connection connection to use for the cluster
-     * @param scan       A Scan object describing the scan
-     * @param tableName  Name of the table to scan
-     * @param threads    maximum number of threads to use
-     * @throws IOException
-     */
     public ParallelScanner(Class entityClass, Scan scan,
                            int threads) throws IOException {
         this(entityClass, scan, threads, threads * scan.getCaching());
     }
 
-    /**
-     * Create a new parallel scanner.
-     *
-     * @param connection connection to use for the cluster
-     * @param scan       A Scan object describing the scan
-     * @param tableName  Name of the table to scan
-     * @param threads    maximum number of threads to use
-     * @param bufferSize maximum number of Result objects to buffer
-     * @throws IOException
-     */
     public ParallelScanner(Class entityClass, Scan scan,
                            int threads, int bufferSize) throws IOException {
         init(entityClass, scan, bufferSize, threads);

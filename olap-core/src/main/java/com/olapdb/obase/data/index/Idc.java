@@ -13,11 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-/**
- * Idc - Index Table Column
- * 用于索引的表列，根据表名与列明查找对应的ID
- * @author HF-36
- */
 public class Idc extends Entity{
 	@SuppressWarnings("unused")
 	private final static String tableName = "olapdb:idc";
@@ -26,12 +21,6 @@ public class Idc extends Entity{
 	private Table refTable;//
 	private String refColumn;
 
-	/**
-	 * 此处最好能够有全局同步，生成Idc.  如果多个JVM并发访问，同时创建可能会造成多个实例、同一意义的Idc有多个不同的id的问题。
-	 * @param table
-	 * @param column
-	 * @return
-	 */
 	synchronized public static Idc getInstance(Table table, String column){
 		String key = combineTag(table, column);
 		Idc idc = idcCache.get(key);
@@ -63,7 +52,6 @@ public class Idc extends Entity{
 		return refColumn;
 	}
 
-	//如果还没有分配id,给tag分配id
 	@Override
 	public RemoteObject connect(){
 		if(this.needConnect()){
@@ -81,13 +69,6 @@ public class Idc extends Entity{
 		return table.getName().getNameWithNamespaceInclAsString()+"|" + column;
 	}
 
-	/*
-	 * 得到一个列对象衍生的值对象列表。
-	 * startRow 扫描的起始行，为空则忽略
-	 * maxResult 控制每次返回的结果数量，防止一次返还过多
-	 *
-	 * 注意：可能要考虑是否要把 起始地址排除在外
-	 */
 	public List<Idx> getIdxs(byte[] startRow, int maxResult){
 		Scan scan = new Scan(Bytez.from(this.getId()), Bytez.from(this.getId()+1));
 		if(startRow != null){
@@ -111,13 +92,6 @@ public class Idc extends Entity{
 		}
 	}
 
-	/**
-	 * 得到一个表所有的使用索引的列对象
-	 * @param table， 表对象
-	 * @param startRow 扫描的起始行，为空则忽略
-	 * @param maxResult 控制每次返回的结果数量，防止一次返还过多
-	 * @return
-	 */
 	public static List<Idc> getTableIdcs(Table table, byte[] startRow, int maxResult){
 		String front = table.getName().getNameWithNamespaceInclAsString()+"|";
 		Scan scan = new Scan(Bytes.toBytes(front), Bytez.next(Bytes.toBytes(front)));

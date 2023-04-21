@@ -5,11 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-/**
- * 批量回收LRU缓存工具
- * @param <K>
- * @param <V>
- */
 public class LruBatchReclaimCache<K,V> extends LinkedHashMap<K,V> {
     private int capacity;
     public LruBatchReclaimCache(int capacity) {

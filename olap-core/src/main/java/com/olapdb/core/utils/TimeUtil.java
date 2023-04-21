@@ -18,11 +18,6 @@ public class TimeUtil {
     private final static SimpleDateFormat simpleDateFormat19 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final static List<String> OlapTimeSeperate = Arrays.asList("-", "-", " ", ":", ":", ".", "");
 
-    /**
-     * 得到7段Text时间
-     * @param date
-     * @return
-     */
     public static List<String> time2segs(Date date)
     {
         List<String> result = new Vector<>(7);
@@ -42,13 +37,6 @@ public class TimeUtil {
         return result;
     }
 
-    /**
-     * 把一个json数据中的时间维度用层级时间维度组替换
-     * @param jo
-     * @param timeDim
-     * @param timeDimType
-     * @return
-     */
     public static JSONObject replaceTimeDimensionToTimeHierachy(JSONObject jo, String timeDim, String timeDimType, AtomicLong youngestDataTime, AtomicLong eldestDataTime){
         String timeInfo = (String)jo.remove(timeDim);
         if(timeInfo != null && !timeInfo.isEmpty()){
@@ -87,23 +75,11 @@ public class TimeUtil {
         return jo;
     }
 
-    /**
-     * a:b:c ...  替换其中的时间维度为时间层级维度
-     * @param group
-     * @param timeDim
-     * @return
-     */
     public static String replaceTimeDimension(String group, String timeDim){
         List<String> dims = Arrays.asList(group.split(":")).stream().map(e->e.equals(timeDim)?StringUtils.join(OlapTimeDims, ':'):e).collect(Collectors.toList());
         return StringUtils.join(dims, ':');
     }
 
-    /**
-     * a:b:c ...  替换其中的时间维度为时间层级维度
-     * @param group
-     * @param timeDim
-     * @return
-     */
     public static void replaceTimeDimension(List<String> group, String timeDim){
         if(group.remove(timeDim)){
             group.addAll(OlapTimeDims);
@@ -135,10 +111,7 @@ public class TimeUtil {
 
         return timeStr.substring(0, length);
     }
-    /**
-     * 根据时间条件时分离出需要的时间维度
-     * @param timeConditions
-     */
+
     public static List<String> deriveTimeDimension(List<String> timeConditions){
         OptionalInt find = timeConditions.stream().mapToInt(e->reduceTimeString(e).length()).max();
         int need = 7;
@@ -191,11 +164,7 @@ public class TimeUtil {
         return OlapTimeDims.subList(0,need);
     }
 
-    /**
-     * 计算时间维度的深度
-     * @param dims
-     * @return
-     */
+
     public static int calcTimeHierachyDepth(List<String> dims){
         int depth = 0;
         for(String dim : OlapTimeDims){
@@ -208,12 +177,6 @@ public class TimeUtil {
         return depth;
     }
 
-    /**
-     * 构建olap时间维过滤扫描前缀
-     * @param timeExpression
-     * @param timeHierachyDepth
-     * @return
-     */
     public static String buildTimeFilterPrefix(String timeExpression, int timeHierachyDepth){
         if(timeHierachyDepth <= 0)return null;
 
@@ -252,16 +215,7 @@ public class TimeUtil {
         return expression;
     }
 
-
-    /**
-     * 合并分离的层级时间维度
-     * @param dimsToValueMap
-     * @param timeDim
-     */
     public static void combineTimeHierachy(Map<String, String> dimsToValueMap, String timeDim){
-        /**
-         * 不包含时间维度
-         */
         if(!dimsToValueMap.containsKey(OlapTimeDims.get(0))){
             return;
         }

@@ -15,9 +15,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class HorizontalFactScanner implements Iterator<Fact> {
-    /**
-     * 排序读取器
-     */
     private TreeSet<IndicatorFactScanner> scanners = new TreeSet<>(new Comparator<IndicatorFactScanner>() {
         @Override
         public int compare(IndicatorFactScanner o1, IndicatorFactScanner o2) {

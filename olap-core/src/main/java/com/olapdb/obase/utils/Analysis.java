@@ -20,9 +20,6 @@ public class Analysis extends Entity {
 		return null;
 	}
 
-	/**
-	 *String request
-	 */
 	public void setRequest(String value){
 		this.setAttribute("request", Bytez.from(value));
 	}
@@ -37,9 +34,6 @@ public class Analysis extends Entity {
 		return this.getHeader("Refer");
 	}
 
-	/**
-	 *String url
-	 */
 	public void setUrl(String value){
 		this.setAttribute("url", Bytez.from(value));
 	}
@@ -50,9 +44,6 @@ public class Analysis extends Entity {
 		return Bytez.toString(bytes);
 	}
 
-	/**
-	 *String url
-	 */
 	public void setIp(String value){
 		this.setAttribute("ip", Bytez.from(value));
 	}
@@ -63,9 +54,6 @@ public class Analysis extends Entity {
 		return Bytez.toString(bytes);
 	}
 
-	/**
-	 *String stub
-	 */
 	public void setStub(String value){
 		if(value == null)value = "";
 		this.setAttribute("stub", Bytez.from(value));
@@ -77,9 +65,6 @@ public class Analysis extends Entity {
 		return Bytez.toString(bytes);
 	}
 
-	/**
-	 *String site
-	 */
 	public void setSite(String value){
 		this.setAttribute("site", Bytez.from(value));
 	}
@@ -90,9 +75,6 @@ public class Analysis extends Entity {
 		return Bytez.toString(bytes);
 	}
 
-	/**
-	 *Headers
-	 */
 	public void setHeader(String item, String value){
 		this.setAttribute("header", item,  Bytez.from(value));
 	}
@@ -106,9 +88,6 @@ public class Analysis extends Entity {
 		return this.getAttributeItems("header");
 	}
 
-	/**
-	 *Cookies
-	 */
 	public void setCookie(String item, String value){
 		this.setAttribute("cookie", item,  Bytez.from(value));
 	}
@@ -122,9 +101,6 @@ public class Analysis extends Entity {
 		return this.getAttributeItems("cookie");
 	}
 
-	/**
-	 *Params
-	 */
 	public void setParam(String item, String value){
 		this.setAttribute("param", item,  Bytez.from(value));
 	}

@@ -68,10 +68,6 @@ public class Bytez extends Bytes{
 		return Base32.decode(v);
 	}
 
-	/**
-	 * 8字节长度日期如： 2019-02-28 ==> 20190228
-	 * @return
-	 */
 	public static String format(Date date){
 		DateFormat df = new SimpleDateFormat("yyyyMMdd");
 		return df.format(date);
@@ -95,11 +91,6 @@ public class Bytez extends Bytes{
 //		return Date.valueOf(str);
 	}
 
-	/**
-	 * 有一个问题。当V本身值已经为最大的时候，加一进位会导致位数增加，这个时候作为停止行不适合。
-	 * @param v
-	 * @return
-	 */
 	private final static byte[] nextSign = new BigInteger(new byte[128]).setBit(1024).toByteArray();
 	static{
 		for(int i=0; i<nextSign.length; i++)nextSign[i] |= 0xff;

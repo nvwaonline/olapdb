@@ -10,7 +10,6 @@ public class ZkLockTest {
         ZkClient zkClient = new ZkClient(server, 5000, 50000);
         String lockPath = "/olap";
 //        ZookeeperLock lock = new ZookeeperLock(zkClient, lockPath, "test");
-        //模拟50个线程抢锁
         for (int i = 0; i < 20; i++) {
             new Thread(new TestThread(i, new ZookeeperLock(zkClient, lockPath, "test"))).start();
         }
@@ -31,7 +30,7 @@ public class ZkLockTest {
             try {
                 while(true){
                     if(lock.lock("ww")){
-                        System.out.println("第"+threadFlag+"线程获取到了锁");
+                        System.out.println("No"+threadFlag+" thread get lock");
                     }
                     Thread.sleep(1000);
                     lock.unlock();

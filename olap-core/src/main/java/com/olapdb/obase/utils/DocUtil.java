@@ -44,7 +44,6 @@ public class DocUtil {
 			}
 		}
 
-		//4. 根据匹配度进行排序
 		Collections.sort(elites, new Comparator<Elite>(){
 			@Override
 			public int compare(Elite arg0, Elite arg1) {
@@ -134,31 +133,14 @@ public class DocUtil {
 		return dif;
 	}
 
-	/**
-	 * 索引更新算法流程
-	 * 1。根据变动表组装词文信息；
-	 * 2. 计算文档的词语总数；
-	 * 3. 根据词根，获取词语引用数；
-	 * 4. 给词文添加引用数信息；
-	 * 5. 添加库中未包含的词根；
-	 * 6. 根据文档ID与词根获取原有词频；
-	 * 7. 整合计算新的词频；
-	 * 8. 词频为0的删除, 并降低词根引用值1；
-	 * 9. 不为0词频的写入更新；
-	 * @param doc
-	 * @param column
-	 * @param fix
-	 * @throws Exception
-	 */
+
 	public static void adjustDocWords(SearchableEntity doc, String column, Hashtable<String, Integer> fix) throws Exception{
-		//解释：词根：词语本身；文档：包含词语的文章；词文：包括词根、文档、词语在文档中出现的次数；
 		int wordCount = 0;
 		int count = fix.size();
 
 		List<String> words = new Vector<String>();
 		words.addAll(fix.keySet());
 
-		//列对象
 		Idc idc= Idc.getInstance(doc.getBasisTable(), column);
 		idc.connect();
 

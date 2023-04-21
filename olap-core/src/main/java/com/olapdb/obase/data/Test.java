@@ -13,28 +13,24 @@ public class Test {
 
 		HPC hpu = new HPC();
 
-		//设置输入变量
 		hpu.set("t", table);
 		hpu.set("r", row);
 		hpu.set("f", family);
 		hpu.set("c", column);
 		hpu.set("ts", time);
 
-		//添加脚本并执行
 		hpu.append("v = t.r.f.c:t");
 		hpu.append("v = t.r.f.c#t");
 		hpu.append("v = ts");
 		hpu.append("t.r.f.c#t = t");
 		hpu.append("h?:u=a");
 
-		//执行脚本
 		try {
 			hpu.exec();
 		} catch (ScriptException e) {
 			e.printStackTrace();
 		}
 
-		//返回结果
 		hpu.get("u");
 	}
 

@@ -24,7 +24,6 @@ import java.util.Vector;
  *
  */
 public class HPC{
-	//脚本添加
 	private StringBuffer sb = new StringBuffer();
 	public HPC append(String sentence){
 		sentence = sentence.replaceAll(" ", "");
@@ -36,7 +35,6 @@ public class HPC{
 		return this;
 	}
 
-	//输入与输出
 	private HashMap<String, Object> inputs = new HashMap<String, Object>();
 	public void put(String name, Object v){
 		inputs.put(name, v);
@@ -183,7 +181,6 @@ public class HPC{
 //		return null;
 //	}
 
-	//1. 根据;进行语句分割
 	public HPC exec() throws ScriptException{
 		String script = sb.toString();
 		String[] commands = script.split(";");
@@ -203,7 +200,6 @@ public class HPC{
 		return this;
 	}
 
-	//2. 判断是否是判断执行a?b:c
 	private void execIfCommand(String comm) throws ScriptException{
 		if(comm == null || comm.length() ==0)
 			return;
@@ -239,7 +235,6 @@ public class HPC{
 		}
 	}
 
-	//3. 根据=分成左右两个部分
 	private void execCommand(String comm) throws ScriptException{
 		if(comm == null)return;
 
@@ -260,7 +255,6 @@ public class HPC{
 	}
 
 	private Ana analysis(String exp) throws ScriptException{
-		//支持null赋值
 		if(exp == null)throw new ScriptException("eval empty string");
 
 		String[] segs = exp.split("#");
@@ -309,7 +303,7 @@ public class HPC{
 
 		for(String var : ana.vars){
 			if(!exist(var))
-				throw new ScriptException("找不到变量: " + var);
+				throw new ScriptException("not found: " + var);
 		}
 
 		if(ana.remote)
@@ -318,13 +312,12 @@ public class HPC{
 			return evalLocal(ana);
 	}
 
-	//获取表变量的值
 	private Object evalRemote(Ana ana) throws ScriptException{
 		if(ana.vars.length<2 || ana.vars.length >4)
-			throw new ScriptException("evalRemote: 参数个数不正确 " + ana.vars.length);
+			throw new ScriptException("evalRemote: paras count not correct: " + ana.vars.length);
 		for(int i=1; i<ana.vars.length; i++){
 			if(!isBytes(ana.vars[i]))
-    			throw new ScriptException("evalRemote: 数据库访问字段["+ana.vars[i]+"]不是byte[]类型");
+    			throw new ScriptException("evalRemote: filed["+ana.vars[i]+"] not byte[] type");
 		}
 		Get get=new Get(getBytes(ana.vars[1]));
 		switch(ana.vars.length){
@@ -347,7 +340,7 @@ public class HPC{
 				if(raws.size() == 0)
 					return null;
 				if(raws.size() >1)
-        			throw new ScriptException("evalRemote: 数据库访问单列数据超过1个");
+        			throw new ScriptException("evalRemote: error");
     			return raws.get(0);
 			}
 			return raws;
@@ -358,7 +351,6 @@ public class HPC{
 		}
 	}
 
-	//获取本地变量的值
 	private Object evalLocal(Ana ana) throws ScriptException{
 		if(ana.vars.length == 0)
 			return null;
@@ -366,13 +358,11 @@ public class HPC{
 		if(ana.vars.length == 1)
 			return get(ana.vars[0]);
 
-		//第一个变量必须是容器类型；
 		if(!isList(ana.vars[0]))
-			throw new ScriptException("表达式["+ana.exp+"]中的变量"+ana.vars[0]+"不是一个List对象");
-		//其他的必须是值类型；
+			throw new ScriptException("expression ["+ana.exp+"] var "+ana.vars[0]+" not List object");
 		for(int i=1; i<ana.vars.length; i++){
 			if(!isBytes(ana.vars[i]))
-				throw new ScriptException("表达式["+ana.exp+"]中的变量"+ana.vars[i]+"不是一个byte[]对象");
+				throw new ScriptException("expression ["+ana.exp+"] var "+ana.vars[i]+"not byte[] type");
 		}
 
 		switch(ana.vars.length){
@@ -384,13 +374,11 @@ public class HPC{
 			return CUtil.get(getList(ana.vars[0]), getBytes(ana.vars[1]), getBytes(ana.vars[2]), getBytes(ana.vars[3]));
 		}
 
-		throw new ScriptException("表达式["+ana.exp+"]无法计算");
+		throw new ScriptException("expression ["+ana.exp+"] can't be calc");
 	}
 
 	private void assignment(String exp, Object value) throws ScriptException{
 		Ana ana = this.analysis(exp);
-//		if(ana.ts != null && !ana.remote)
-//			throw new ScriptException("容器赋值语句等式左边不能有版本信息["+ana.exp+"]");
 
 		if(ana.remote)
 			assignmentRemote(ana, value);
@@ -398,19 +386,13 @@ public class HPC{
 			assignmentLocal(ana, value);
 	}
 
-	/**
-	 * 远程变量赋值
-	 * @param ana
-	 * @param value
-	 * @throws ScriptException
-	 */
 	@SuppressWarnings("unchecked")
 	private void assignmentRemote(Ana ana, Object value) throws ScriptException{
 		if(ana.vars.length<2 || ana.vars.length >4)
-			throw new ScriptException("assiRemote: 参数个数不正确 " + ana.vars.length);
+			throw new ScriptException("assiRemote: paras number not correct: " + ana.vars.length);
 		for(int i=1; i<ana.vars.length; i++){
 			if(! isBytes(ana.vars[i]))
-    			throw new ScriptException("assiRemote: 数据库访问字段["+ana.vars[i]+"]不是byte[]类型");
+    			throw new ScriptException("assiRemote: field["+ana.vars[i]+"] not byte[] type");
 		}
 
 		Put put=new Put(getBytes(ana.vars[1]));
@@ -436,7 +418,6 @@ public class HPC{
 		}
 	}
 
-	//给row赋值
 	private void fillPut(Put put, List<Cell> value, Long ts){
 		for(Cell c : value){
 			if(ts == null)
@@ -445,7 +426,6 @@ public class HPC{
 				put.addColumn(CellUtil.cloneFamily(c), CellUtil.cloneQualifier(c), ts, CellUtil.cloneValue(c));
 		}
 	}
-	//给family赋值
 	private void fillPut(Put put, byte[] family, List<Cell> value, Long ts){
 		for(Cell c : value){
 			if(ts == null)
@@ -454,7 +434,6 @@ public class HPC{
 				put.addColumn(family, CellUtil.cloneQualifier(c), ts, CellUtil.cloneValue(c));
 		}
 	}
-	//给column赋值
 	private void fillPut(Put put, byte[] family, byte[] column, byte[] value, Long ts){
 		if(ts == null || ts<0)
 			put.addColumn(family, column, value);
@@ -462,44 +441,34 @@ public class HPC{
 			put.addColumn(family, column, ts, value);
 	}
 
-	/**
-	 * 本地变量赋值
-	 * @param ana
-	 * @param value
-	 * @throws ScriptException
-	 */
 	private void assignmentLocal(Ana ana, Object value) throws ScriptException{
-		//如果只有一个变量，直接赋值
 		if(ana.vars.length == 1){
 			put(ana.vars[0], value);
 			return;
 		}
 
-		//有两个及以上字段的为对容器操作，不管哪一种，
 		for(int i=1; i<ana.vars.length; i++){
 			if(! isBytes(ana.vars[i]))
-    			throw new ScriptException("assiLocal: 目标字段["+ana.vars[i]+"]不是byte[]类型");
+    			throw new ScriptException("assiLocal: field ["+ana.vars[i]+"] not byte[]");
 		}
 
-		//两个以上的变量，必须是容器赋值
-		//如果不存在,或者为byte[]
 		if(!exist(ana.vars[0]) || isBytes(ana.vars[0])){
 			setList(ana.vars[0]);
 		}
 
 		if(ana.vars.length<2 || ana.vars.length >4)
-			throw new ScriptException("assiRemote: 参数个数不正确 " + ana.vars.length);
+			throw new ScriptException("assiRemote: error  " + ana.vars.length);
 
 		List<Cell> container = getList(ana.vars[0]);
 
 		switch(ana.vars.length){
-		case 2: //write row    value必须是List或者Cell类型  整行替换
+		case 2: //write row
 			CUtil.assiRow(container, getBytes(ana.vars[1]), value, ana.ts);
 			break;
-		case 3: //table row cf  value必须是List或者Cell类型  整family替换
+		case 3: //table row cf
 			CUtil.assiFamily(container, getBytes(ana.vars[1]), getBytes(ana.vars[2]), value, ana.ts);
 			break;
-		case 4: //table row cf column  value必须是byte[]或者Cell类型 整列替换
+		case 4: //table row cf column
 			CUtil.assiColumn(container, getBytes(ana.vars[1]), getBytes(ana.vars[2]), getBytes(ana.vars[3]), value, ana.ts);
 			break;
 		}

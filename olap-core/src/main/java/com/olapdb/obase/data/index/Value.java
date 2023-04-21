@@ -114,21 +114,15 @@ public class Value{
 		this.data = data;
 	}
 
-	/**
-	 * 排序的字节数组
-	 * @return
-	 */
 	public byte[] ranking(){
 		return ranking(data, type);
 	}
 
 	private static byte[] ranking(byte[] data, int type){
 		switch(type){
-		//固定长度
 		case Type_Boolean:
 			return data.clone();
 
-		//固定符号
 		case Type_Byte:
 		case Type_Short:
 		case Type_Int:
@@ -156,7 +150,6 @@ public class Value{
 			}
 		}
 
-		//可变长度
 		case Type_String:
 		case Type_Bytes:
 			return Bytez.add(Bytez.from((short)data.length), data);
@@ -178,11 +171,9 @@ public class Value{
 
 	private static byte[] nullData(int type){
 		switch(type){
-		//固定长度
 		case Type_Boolean:
 			return Bytez.from(false);
 
-		//固定符号
 		case Type_Byte:
 			return Bytez.from((byte)0);
 		case Type_Short:
@@ -263,7 +254,6 @@ public class Value{
 		case Type_Double:
 			return Bytez.toDouble(data);
 
-		//可变长度
 		case Type_String:
 			return Bytez.toString(data);
 		}

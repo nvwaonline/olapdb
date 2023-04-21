@@ -43,12 +43,6 @@ public class VectorUtil {
 		return ret;
 	}
 
-	/**
-	 * 计算标签向量之间的相似性
-	 * @param a
-	 * @param b
-	 * @return
-	 */
 	public static double calcSimilar(List<Tag> a, List<Tag> b){
 		double length_a = 0;
 		double length_b = 0;

@@ -16,20 +16,9 @@ public abstract class RecommendEntity extends SearchableEntity{
 		super(r);
 	}
 
-	/**
-	 * 获取模拟退火系数24小时为周期
-	 * @return
-	 */
 	public double getAneCoef(){return Annealing.FIRM_COEF;}
-	/**
-	 * 获取标签数
-	 * @return
-	 */
 	public int getTagDimension(){return 100;}
 
-	/**
-	 * 添加标签，设置标签，获取标签，标签就是维度，利用标签之间的相似性计算对象的相似性
-	 */
 	public void learningTag(String tag, Double rate){
 		byte[] data = this.getAttribute("tag", tag);
 		double old = 0;
@@ -38,7 +27,6 @@ public abstract class RecommendEntity extends SearchableEntity{
 		}
 
 		this.setAttribute("tag", tag, Bytez.from(Annealing.add(old, rate, this.getAneCoef())));
-		//检查是否超出最大标签维度
 		checkTagDimension();
 	}
 
@@ -65,7 +53,6 @@ public abstract class RecommendEntity extends SearchableEntity{
 		}
 
 		this.setAttribute("tag", items, values);
-		//检查是否超出最大标签维度
 		checkTagDimension();
 	}
 
@@ -94,7 +81,7 @@ public abstract class RecommendEntity extends SearchableEntity{
 		for(String word : curs.keySet()){
 			curTags.add(new Tag(word, curs.get(word)));
 		}
-		formatTags(curTags);//排序截取
+		formatTags(curTags);
 		curs.clear();
 		for(Tag t:curTags){
 			curs.put(t.word, t.weight);
@@ -133,11 +120,6 @@ public abstract class RecommendEntity extends SearchableEntity{
 		}
 	}
 
-
-	/**
-	 * 设置标签
-	 * @param tags
-	 */
 	public void setTags(List<Tag> tags){
 		if(tags == null || tags.isEmpty())
 			return;
@@ -154,52 +136,17 @@ public abstract class RecommendEntity extends SearchableEntity{
 			values[i] = Bytez.from(Annealing.add(0, tag.weight, this.getAneCoef()));
 		}
 		this.setAttribute("tag", items, values);
-		//检查是否超出最大标签维度
 		checkTagDimension();
 	}
 
-	/**
-	 * 返回原始的标签数据
-	 * @return
-	 */
 	public List<Tag> getTags() {
-//		List<Tag> tags = new Vector<Tag>();
-//
-//		for(String word:this.getAttributeItems("tag")){
-//			Tag tag = new Tag();
-//			tag.word = word;
-//			tag.weight = Bytez.toDouble(this.getAttribute("tag", word));
-//			tags.add(tag);
-//		}
-//		Collections.sort(tags);
-//
-//		return tags;
-
 		return getAttributeItems("tag").stream()
 				.map(item->new Tag(item, Bytez.toDouble(this.getAttribute("tag", item))))
 				.sorted().collect(Collectors.toList());
 	}
 
-	/**
-	 * 转换为一个长度 = 1的标准向量
-	 * @return
-	 */
 	public List<Tag> getNormalTags() {
 		List<Tag> tags = getTags();
-
-//		double total = 0;
-//		for(Tag tag : tags){
-//			total += tag.weight*tag.weight;
-//		}
-//
-//		if(total == 0)total = 1;
-//		total = Math.sqrt(total);
-//
-//		for(Tag tag : tags){
-//			tag.weight /= total;
-//		}
-//
-//		return tags;
 
 		double total = tags.stream().map(t->t.weight*t.weight).reduce(0.0, (x,y)->x+y);
 		if(total == 0)total = 1;
@@ -211,11 +158,6 @@ public abstract class RecommendEntity extends SearchableEntity{
 		return tags;
 	}
 
-	/**
-	 * 获取比重最大的几个维度标签
-	 * @param size
-	 * @return
-	 */
 	public List<Tag> getShowTags(int size){
 		List<Tag> tags = this.getTags();
 		Collections.sort(tags);
@@ -228,10 +170,6 @@ public abstract class RecommendEntity extends SearchableEntity{
 		return tags;
 	}
 
-	/**
-	 * 得到退火后的标签
-	 * @return
-	 */
 	public List<Tag> getAnneTags(){
 		List<Tag> tags = this.getTags();
 		for(Tag t : tags){
@@ -250,10 +188,6 @@ public abstract class RecommendEntity extends SearchableEntity{
 		return VectorUtil.calcSimilar(a.getTags(), b.getTags());
 	}
 
-	/**
-	 * 排序截取标签维度
-	 * @param tags
-	 */
 	private void formatTags(List<Tag> tags){
 		Collections.sort(tags);
 

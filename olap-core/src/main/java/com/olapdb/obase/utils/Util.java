@@ -38,7 +38,6 @@ public class Util {
 		return ++serialId;
 	}
 
-	//序列号
 	private final static Object lockInt = new Object();
 	private static int serialInt = 0;
 	public static int getSerialInt(){
@@ -57,7 +56,6 @@ public class Util {
 		return Long.MAX_VALUE - time;
 	}
 
-	//二进制反转
 	public static long reverse(long i) {
 		// HD, Figure 7-1
 		i = (i & 0x5555555555555555L) << 1 | (i >>> 1) & 0x5555555555555555L;
@@ -69,7 +67,6 @@ public class Util {
 		return i;
 	}
 
-	//二进制反转
 	public static int reverse(int i) {
 		return (int)(reverse((long)i)>>32);
 	}
@@ -318,11 +315,6 @@ public class Util {
 		}
 	}
 
-	/**
-	 * 生成预分区数据
-	 * @param partition
-	 * @return
-	 */
 	public static byte[][] calcSplitKeys(int partition) {
 		byte[][] splitKeys = new byte[partition][];
 		for(int i=0; i<partition; i++){
@@ -356,25 +348,16 @@ public class Util {
 		return baos.toByteArray();
 	}
 
-	/**
-	 * 更加索引行号获得索引的行键
-	 * @param startRow
-	 * @return
-	 */
 	public static byte[] getIndexRow(byte[] startRow){
 		return Bytes.add(startRow, Bytes.toBytes("i"));
 	}
 
-
-
-	//服务端调用
 	public static byte[] invoke(Object o, byte[] bytes) throws Exception{
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		ObjectInputStream ois = new ObjectInputStream(bais);
 		return invoke(o, ois);
 	}
 
-	//服务端调用
 	public static byte[] invoke(Object o, ObjectInputStream ois) throws Exception{
 		String method = ois.readUTF();
 		int pnum = ois.readInt();
@@ -400,15 +383,6 @@ public class Util {
 		return baos.toByteArray();
 	}
 
-	/**
-	 * 针对实现了RegionOperationObserve的类执行服务端region操作调用
-	 *
-	 * @param entityClass 所在类
-	 * @param startKey region start key
-	 * @param method 方法名
-	 * @return 成功或失败
-	 * @throws Exception
-	 */
 	public static boolean execRegionOperation(Class entityClass, byte[] startKey, String method, byte[] splitPoint) throws Exception{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -559,7 +533,7 @@ public class Util {
 	}
 	private static boolean isChinese(char c) {
 		boolean result = false;
-		if (c >= 19968 && c <= 171941) {// 汉字范围 \u4e00-\u9fa5 (中文)
+		if (c >= 19968 && c <= 171941) {
 			result = true;
 		}
 		return result;
@@ -568,9 +542,9 @@ public class Util {
 	public static String readTxtFile(String filePath){
 		try{
 			File file=new File(filePath);
-			if(file.isFile() && file.exists()){ //判断文件是否存在
+			if(file.isFile() && file.exists()){
 				InputStreamReader read = new InputStreamReader(
-						new FileInputStream(file));//考虑到编码格式
+						new FileInputStream(file));
 				BufferedReader bufferedReader = new BufferedReader(read);
 				StringBuffer sb = new StringBuffer();
 				String lineTxt = null;
@@ -590,7 +564,7 @@ public class Util {
 		try{
 			File file=new File(filePath);
 			OutputStreamWriter writer = new OutputStreamWriter(
-					new FileOutputStream(file));//考虑到编码格式
+					new FileOutputStream(file));
 			BufferedWriter bufferedWriter = new BufferedWriter(writer);
 			bufferedWriter.write(text);
 			bufferedWriter.close();
@@ -627,7 +601,6 @@ public class Util {
 
 			hConnect.connect();
 
-			// 读取内容
 			BufferedReader rd = new BufferedReader(new InputStreamReader(
 					hConnect.getInputStream()));
 			int ch;
@@ -699,7 +672,7 @@ public class Util {
 			return null;
 		try {
 			URL hurl = new  URL(url);
-			return hurl.getHost();// 获取主机名
+			return hurl.getHost();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			return null;
@@ -717,11 +690,6 @@ public class Util {
 		}
 	}
 
-	/**
-	 * 获取类所有的路径
-	 * @param cls
-	 * @return
-	 */
 	public static String where(@SuppressWarnings("rawtypes") final Class cls) {
 		if (cls == null)throw new IllegalArgumentException("null input: cls");
 		URL result = null;
@@ -837,9 +805,9 @@ public class Util {
 
 
 	/**
-	 * 计算单机不重复的纳秒时间。计算时间范围 < 公元2262年
+	 * nano time time scope < 2262
 	 * Obase.nanoTime()/1000000 = System.currentTimeMillis()
-	 * @return 从1970-01-01 00：00：00开始计算的纳秒数
+	 * from1970-01-01 00:00:00 calc nano seconds
 	 */
 	private static long atomicMillis = 0;
 	private static long atomicNanos = 0;
@@ -849,9 +817,6 @@ public class Util {
 			atomicNanos += 1;
 		}else{
 			atomicMillis = millis;
-			/**
-			 * 采用随机数初始化防止多节点时间碰撞
-			 */
 			atomicNanos = (long)(Math.random()*100000);
 		}
 
@@ -864,12 +829,6 @@ public class Util {
 		return nanos/1000000;
 	}
 
-	/**
-	 * 获取系统首选IP
-	 *
-	 * @return
-	 * @throws UnknownHostException
-	 */
 	private static byte[] localAddress;
 	public static byte[] getLocalIPV4(){
 		if(localAddress == null){
@@ -882,9 +841,6 @@ public class Util {
 		return localAddress;
 	}
 
-	/**
-	 * 得到格式化的本地时间
-	 */
 	private static FastDateFormat fastDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
 	public static String formatTimeString(long timeMilliSeconds){
 		return fastDateFormat.format(new Date((timeMilliSeconds)));

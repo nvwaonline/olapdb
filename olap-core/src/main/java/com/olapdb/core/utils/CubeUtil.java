@@ -23,7 +23,7 @@ public class CubeUtil {
 
         List<String> factors = cube.getDimGroups();
 
-        log.info("分组列表 = {}", factors);
+        log.info("group list = {}", factors);
 
         List<List<String>> combines = CombinationUtil.combiantion(factors.toArray(new String[0]));
         Collections.reverse(combines);
@@ -31,15 +31,11 @@ public class CubeUtil {
         int index = 0;
         for (List<String> combine : combines) {
             String dimString = StringUtils.join(combine,":");
-            /**
-             * 预构建Cuboid中，除基础分组可以包含OLAP_OPERATION维度外，其他维度组合不包含OLAP_OPERATION维度
-             */
+
             List<String> dims = DwUtil.dimStringToSortedList(dimString, entityDimList);
             if(index == 0) {
-                //第一个为基础分组，全维度
                 valids.add(DwUtil.unify(dims, entityDimList));
 
-                //如果维度包含OLAP_OPERATION选项，增加一个不包含此项的权维度Cuboid
                 if(dims.contains(OlapOperation.getKey())){
                     List<String> dimsWithoutOlapOperation = new Vector<>();
                     dimsWithoutOlapOperation.addAll(dims);
@@ -47,7 +43,6 @@ public class CubeUtil {
                     valids.add(DwUtil.unify(dimsWithoutOlapOperation, entityDimList));
                 }
             }else{
-//                dims.remove(Olap.OLAP_OPERATION);
                 dims = DwUtil.looseDimentions(cube, dims);
                 String unifyString = DwUtil.unify(dims, entityDimList);
                 if(!valids.contains(unifyString)){
@@ -64,7 +59,6 @@ public class CubeUtil {
         }
         cuboids.forEach(e->e.setPhase(CuboidPhase.PRODUCTIVE));
 
-        //优化所有父子关系
         optimizeInheritedRelation(cube, cuboids);
 
         Obase.saveAll(cuboids);
@@ -75,7 +69,6 @@ public class CubeUtil {
     }
 
     public static void optimizeInheritedRelation(Cube cube, List<Cuboid> cuboids){
-        //父子关系有改动的列表;
         final Set<Cuboid> changeSet = new HashSet<>();
 
         List<Segment> segments = Segment.stream(cube).filter(e->e.inProduce()).collect(Collectors.toList());
@@ -144,16 +137,9 @@ public class CubeUtil {
         log.info("OLAP {} {} - > {} ...", segment.getIdentify(), parent.getName(), cuboid.getName() );
         long startTime = System.currentTimeMillis();
 
-        /**
-         * 计算子cuboid 的维度列表
-         */
         List<String> sonDimList = cuboid.getDimList();
-        /**
-         * 计算需留下的列在Parent中的index
-         */
         List<Integer> lefts = sonDimList.stream().map(e->parentDimList.indexOf(e)).collect(Collectors.toList());
 
-        //构建 voxels
         Map<String, Voxel> voxelMap = new HashMap<>(100000);
         AtomicInteger atomicCounter = new AtomicInteger(0);
 
@@ -172,9 +158,6 @@ public class CubeUtil {
         });
 
 
-        /**
-         * 清理掉互相抵消的
-         */
         voxelMap.entrySet().removeIf(e->!e.getValue().valid());
 
         log.info("OLAP {} {} - > {} spent Time = {}  id: {} - > {}",  segment.getIdentify(), atomicCounter.get(), voxelMap.size(), System.currentTimeMillis()-startTime, parent.getId(), cuboid.getId() );
@@ -189,37 +172,22 @@ public class CubeUtil {
     public static void destroyCube(Cube cube){
         if(cube.getEnable())return;
 
-        /**
-         * 清理SegBuildTask
-         */
         SegBuildTask.stream(cube).forEach(e->{
             e.delete();
         });
 
-        /**
-         * 清理SegCombineTask
-         */
         SegCombineTask.stream(cube).forEach(e->{
             e.delete();
         });
 
-        /**
-         * 清理CuboidAddTask
-         */
         SegMendTask.stream(cube).forEach(e->{
             e.delete();
         });
 
-        /**
-         * 清理Segment
-         */
         Segment.stream(cube).forEach(e->{
             destroySegment(cube, e);
         });
 
-        /**
-         * 清理Cuboid
-         */
         while(true) {
             List<Cuboid> cuboids = Cuboid.stream(cube.getIdenticalName()).limit(10000).collect(Collectors.toList());
             if (cuboids.isEmpty())break;
@@ -227,14 +195,8 @@ public class CubeUtil {
         }
 
 
-        /**
-         * 清理Cube
-         */
         cube.delete();
 
-        /**
-         * 清理Cube对应的计数器
-         */
         try {
             Util.clearOrderID(Obase.getTable(Cuboid.class), "cuboidUnifyIdentify-" + cube.getIdenticalName());
         }catch (Exception e){
@@ -251,9 +213,6 @@ public class CubeUtil {
     public static void clearCube(Cube cube){
         if(cube.getEnable())return;
 
-        /**
-         * 杀掉正在进行的任务
-         */
         SegBuildTask.stream(cube).forEach(e->{
             try {
                 DwUtil.killSegTask(e);
@@ -262,9 +221,6 @@ public class CubeUtil {
             }
         });
 
-        /**
-         * 杀掉正在进行的任务
-         */
         SegCombineTask.stream(cube).forEach(e->{
             try {
                 DwUtil.killSegTask(e);
@@ -273,9 +229,6 @@ public class CubeUtil {
             }
         });
 
-        /**
-         * 杀掉正在进行的任务
-         */
         SegMendTask.stream(cube).forEach(e->{
             try {
                 DwUtil.killSegTask(e);
@@ -284,39 +237,24 @@ public class CubeUtil {
             }
         });
 
-
-        //等待2秒
         try {
             Thread.sleep(2000);
         }catch (Exception e){
             log.error("OLAP Kill Task Failed", e);
         }
 
-
-        /**
-         * 清理SegBuildTask
-         */
         SegBuildTask.stream(cube).forEach(e->{
             e.delete();
         });
 
-        /**
-         * 清理SegCombineTask
-         */
         SegCombineTask.stream(cube).forEach(e->{
             e.delete();
         });
 
-        /**
-         * 清理CuboidAddTask
-         */
         SegMendTask.stream(cube).forEach(e->{
             e.delete();
         });
 
-        /**
-         * 清理Segment
-         */
         Segment.stream(cube).forEach(e->{
             e.setPhase(SegmentPhase.ARCHIVE);
         });

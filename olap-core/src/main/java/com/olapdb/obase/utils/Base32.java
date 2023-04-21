@@ -114,11 +114,6 @@ public class Base32 {
         return bytes;
     }
 
-    /** For testing, take a command-line argument in Base32, decode,
-     * print in hex, encode, print
-     *
-     * @param args
-     */
     static public void main(String[] args) {
         if (args.length == 0) {
             System.out.println("Supply a Base32-encoded argument.");

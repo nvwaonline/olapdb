@@ -58,9 +58,6 @@ public class StatUtil {
         return records;
     }
 
-    /**
-     * 扫描数据库信息推送系统统计分析模型
-     */
     public static JSONObject cubeStatisticInfo(Cube cube,
                                                List<Segment> segments,
                                                List<Cuboid> cuboids,

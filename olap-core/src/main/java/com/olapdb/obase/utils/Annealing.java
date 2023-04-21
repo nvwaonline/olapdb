@@ -1,11 +1,10 @@
 package com.olapdb.obase.utils;
 
 public class Annealing {
-	public final static double FIRM_COEF = 1.0; //退火系数 永不磨灭
-	public final static double RECM_COEF = 0.99; //退火系数 推荐
-	private final static double PERIOD = 86400000.0; //周期为1天
-	private final static long ORIGIN = 1451577600000L;  //时间原点设置为2016.01.01 1451577600000
-//	private final static long ORIGIN = new Date("2016/01/01").getTime();  //时间原点设置为2016.01.01 1451577600000
+	public final static double FIRM_COEF = 1.0;
+	public final static double RECM_COEF = 0.99;
+	private final static double PERIOD = 86400000.0;
+	private final static long ORIGIN = 1451577600000L;  //2016.01.01 1451577600000
 
 	public static double anneValue(double value, double coef){
 		if(coef == FIRM_COEF)return value;

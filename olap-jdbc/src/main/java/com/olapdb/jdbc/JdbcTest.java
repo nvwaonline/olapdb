@@ -31,10 +31,7 @@ public class JdbcTest {
 
 		for (int j = 0; j < 1; j++) {
 			Statement state = conn.createStatement();
-//			ResultSet resultSet = state.executeQuery("select caller_num,\"product_name\",\"chanel_id\",\"chanel_key\" from biocloo.\"call\"");
-//			ResultSet resultSet = state.executeQuery("select \"duration.count\" from \"biocloo\".\"call\" ");
-			ResultSet resultSet = state.executeQuery("select \"year\"||'-'||\"month\"||'-'||\"day\", \"business_name\",  from \"outbound\".\"ocall\" limit 1000");
-//			ResultSet resultSet = state.executeQuery("SELECT CAST(FLOOR(CAST(\"year\"||'-'||\"month\"||'-'||\"day\"||' '||\"hour\"||':'||\"minute\"||':00' AS TIMESTAMP) TO MINUTE) AS TIMESTAMP) AS \"__timestamp\",\n       max(\"jietong.count\") AS \"拨打数\",\n       max(\"jietong.sum\") AS \"接通数\",\n       max(\"jietong.avg\") AS \"接通率\"\nFROM outbound.ocall\nWHERE \"year\"||'-'||\"month\"||'-'||\"day\"||' '||\"hour\"||':'||\"minute\"||':00' >= '2020-08-04 00:00:00.000000'\n  AND \"year\"||'-'||\"month\"||'-'||\"day\"||' '||\"hour\"||':'||\"minute\"||':00' < '2020-08-05 00:00:00.000000'\nGROUP BY CAST(FLOOR(CAST(\"year\"||'-'||\"month\"||'-'||\"day\"||' '||\"hour\"||':'||\"minute\"||':00' AS TIMESTAMP) TO MINUTE) AS TIMESTAMP)\nORDER BY \"__timestamp\" ASC\nLIMIT 1000"					);
+			ResultSet resultSet = state.executeQuery("select caller_num,\"product_name\",\"chanel_id\",\"chanel_key\" from biocloo.\"call\"");
 			printResultSetMetaData(resultSet);
 			printResultSet(resultSet);
 

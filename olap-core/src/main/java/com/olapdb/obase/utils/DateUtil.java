@@ -59,9 +59,6 @@ public class DateUtil {
     }
 
 
-    /*
-     * 将时间转换为时间戳
-     */
     public static String dateToStamp(String s){
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -75,9 +72,7 @@ public class DateUtil {
         res = String.valueOf(ts);
         return res;
     }
-    /*
-     * 将时间戳转换为时间
-     */
+
     public static String stampToDate(String s){
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -86,9 +81,7 @@ public class DateUtil {
         res = simpleDateFormat.format(date);
         return res;
     }
-    /*
-     * 将时间戳转换为时间
-     */
+
     public static String stampToDate(String s,String fmt){
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(fmt);
@@ -97,11 +90,7 @@ public class DateUtil {
         res = simpleDateFormat.format(date);
         return res;
     }
-    /**
-     * 返回int类型的 年月
-     *
-     * @return YYYYMM
-     */
+
     public static Integer monthAt() {
         String time = new DateTime().toString("yyyyMM");
         return Integer.valueOf(time);

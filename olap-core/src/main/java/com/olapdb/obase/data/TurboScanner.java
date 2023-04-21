@@ -26,12 +26,6 @@ public class TurboScanner extends AbstractClientScanner {
     private ResultScanner rs;
     private boolean scanFinished = false;
 
-    /**
-     * Create a new push scanner.
-     *
-     * @param scan A Scan object describing the scan
-     * @throws IOException
-     */
     public TurboScanner(Class entityClass, Scan scan, int bufferSize){
         results = new LinkedBlockingQueue<>(bufferSize);
 

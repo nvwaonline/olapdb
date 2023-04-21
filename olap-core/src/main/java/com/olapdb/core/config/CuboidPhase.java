@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum CuboidPhase {
-    CANDIDATE  (0,"candidate"), //候选
-    APPROVED   (1,"approved"),  //已通过审核
-    CHARGING   (2,"charging"),  //准备中
-    PRODUCTIVE (3,"productive"),//生产中
-    DEPRECATED (4,"deprecated"),//已废弃
+    CANDIDATE  (0,"candidate"),
+    APPROVED   (1,"approved"),
+    CHARGING   (2,"charging"),
+    PRODUCTIVE (3,"productive"),
+    DEPRECATED (4,"deprecated"),
     ;
 
     private CuboidPhase(int code, String name) {

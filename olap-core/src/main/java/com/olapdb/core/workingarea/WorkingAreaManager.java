@@ -15,11 +15,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
-/**
- * 工作区域管理
- * Segment生成数据写入Region的时候，开启独占模式，防止多个segment生成数据导致数据被污染
- */
-
 @Slf4j
 public class WorkingAreaManager {
     private static ZkClient zkClient;
@@ -27,7 +22,6 @@ public class WorkingAreaManager {
 
     public synchronized static void initZkClient() {
         if(zkClient == null) {
-            //1. 初始化分布式集群锁
             try {
                 String zkServerAddress = Obase.SERVER;
                 zkClient = new ZkClient(zkServerAddress, 300000, 30000);
@@ -35,18 +29,18 @@ public class WorkingAreaManager {
                 zkClient.subscribeStateChanges(new IZkStateListener(){
                     public void handleStateChanged(Watcher.Event.KeeperState state) throws Exception {
                         if (state == Watcher.Event.KeeperState.Disconnected) {
-                            log.error("OLAP ERROR zookeeper 断开连接");
+                            log.error("OLAP ERROR zookeeper disconnected");
                         } else if (state == Watcher.Event.KeeperState.SyncConnected) {
-                            log.info("OLAP INFO zookeeper 连接成功");
+                            log.info("OLAP INFO zookeeper connect success");
                         }
                     }
                     public void handleNewSession() throws Exception {
-                        log.info("OLAP INFO zookeeper 重新连接成功");
+                        log.info("OLAP INFO zookeeper reconnect success");
                     }
 
                     @Override
                     public void handleSessionEstablishmentError(Throwable throwable) throws Exception {
-                        log.error("OLAP ERROR zookeeper 连接失败");
+                        log.error("OLAP ERROR zookeeper connect failed");
                     }
                 });
                 if (!zkClient.exists("/olap")) {
@@ -62,10 +56,6 @@ public class WorkingAreaManager {
         }
     }
 
-    /**
-     * 根据region信息 创建集群信息
-     * @param locations
-     */
     private static void initRegions(List<HRegionLocation> locations){
         for (HRegionLocation location : locations){
             byte[] startKey = location.getRegion().getStartKey();
@@ -85,11 +75,6 @@ public class WorkingAreaManager {
         return workingAreaMap.size();
     }
 
-    /**
-     * 分配一个新的segment id for write.
-     * @return
-     * @throws Exception
-     */
     public static long allocateSegmentId()throws Exception{
         while (true) {
             long[] ids = Segment.allocateSegmentIds(7);
@@ -97,16 +82,11 @@ public class WorkingAreaManager {
                 if (lockSegment(id))
                     return id;
             }
-            log.info("获取空闲的工作区域失败，等待重试");
+            log.info("Applu workingarea failed, wait for retry");
             Thread.sleep(10000);
         }
     }
 
-    /**
-     * 尝试独占segment写入
-     * @param segmentId
-     * @return
-     */
     synchronized public static boolean lockSegment(long segmentId ){
         WorkingArea workingArea = getWorkingAreaBySegmentId(segmentId);
         if(workingArea.isLocked())
@@ -115,11 +95,6 @@ public class WorkingAreaManager {
         return workingArea.lock(segmentId);
     }
 
-    /**
-     * 释放segment写入
-     * @param segmentId
-     * @return
-     */
     synchronized public static boolean releaseSegment(long segmentId ){
         WorkingArea workingArea = getWorkingAreaBySegmentId(segmentId);
         return workingArea.release(segmentId);

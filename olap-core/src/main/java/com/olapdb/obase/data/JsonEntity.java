@@ -13,15 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-/**
- * 文档类对象
- * @author Victor.Shaw
- * 具有创建时间、词语总数、被引用数次数属性，
- */
 public abstract class JsonEntity extends TimeEntity {
-	/*
-	 * 保存对象的索引列, 为Json对象的哪些最上层列建立索引
-	 */
 	private static Map<String, Set<String>> indexColumns = new HashMap<String, Set<String>>();
 	public static void addIndexColumn(String cname,String column){
 		Set<String> cols = indexColumns.get(cname);

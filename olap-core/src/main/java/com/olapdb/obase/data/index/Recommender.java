@@ -34,11 +34,6 @@ public class Recommender {
 		return this;
 	}
 
-	/**
-	 * 推荐靠前的几个
-	 * @param count
-	 * @return
-	 */
 	public List<byte[]> top(int count){
 		List<byte[]> finds = list();
 		if(finds == null)
@@ -56,10 +51,6 @@ public class Recommender {
 		return rets;
 	}
 
-	/**
-	 * 推荐，返回推荐的行集合
-	 * @return 匹配的行集合
-	 */
 	public List<byte[]> list(){
 		if(tags == null)
 			return null;
@@ -138,7 +129,6 @@ public class Recommender {
 		return finds;
 	}
 
-	//临时标签对象
 	private class TempEntity extends RecommendEntity{
 		public TempEntity(byte[] row) {
 			super(row);

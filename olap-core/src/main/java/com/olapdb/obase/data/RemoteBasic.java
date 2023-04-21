@@ -59,10 +59,6 @@ public abstract class RemoteBasic extends RemoteObject{
 		return timestamp;
 	}
 
-	/**
-	 * 行键转base64字符串方法
-	 * @return
-	 */
 	public String getRowAsBase64(){
 		return Bytez.toBase64(row);
 	}
@@ -70,16 +66,10 @@ public abstract class RemoteBasic extends RemoteObject{
 		return Bytez.fromBase64(base64);
 	}
 
-	/**
-	 * 更换行键，容易出错，不推荐使用。与数据库已连接的对象此操作出错
-	 * @param start
-	 * @param end
-	 * @param nbytes
-	 */
 	@Deprecated
 	protected void updateRowKey(int start, int end, byte[] nbytes)throws Exception{
 		if(!this.needConnect())
-			throw new Exception("与数据库已连接的对象不允许进行行键更新操作");
+			throw new Exception("data not allow update");
 
 		row = Bytez.add(Bytez.copy(row, 0, start)
 				, nbytes
@@ -105,7 +95,7 @@ public abstract class RemoteBasic extends RemoteObject{
 //			Indexer.incRowCount(this.getBasisTable(),1);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 		}
 
 		return this;
@@ -115,12 +105,6 @@ public abstract class RemoteBasic extends RemoteObject{
 		this.connected = false;
 	}
 
-	/**
-	 * 收集对象的用于更新的数据集。
-	 * 对于这种非连接的对象，现有数据会全部添加到Put对象。
-	 * 由于更新时间不可控制，所以这种对象的索引添加时间不可控。
-	 * @return
-	 */
 	public Put collect(){
 		if(this.connected)
 			return null;
@@ -130,7 +114,7 @@ public abstract class RemoteBasic extends RemoteObject{
 			return putall();
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 		}
 	}
 
@@ -142,23 +126,22 @@ public abstract class RemoteBasic extends RemoteObject{
 			return putColumn(column);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 		}
 	}
 
 	public void delete(){
-		//删除对象
 		Delete delete = new Delete(this.getRow());
 		try {
 			this.getBasisTable().delete(delete);
 //			Indexer.decRowCount(this.getBasisTable());
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 		}
 
 		this.disconnect();
-		//删除对象相关的索引
+		//delete data index...
 	}
 	private void saveall() throws Exception{
 		this.getBasisTable().put(putall());
@@ -209,26 +192,22 @@ public abstract class RemoteBasic extends RemoteObject{
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 		}
 
 		return true;
 	}
 
 	public void set(byte[] column, byte[] data){
-		//如果本地缓存中的数据有更新，同步更新表中的数据
 		byte[] value = basis.get(column);
 
-		//什么都没改变
 		if(value != null && Bytes.equals(data, value))
 			return;
 
 		value = data;
 
-		//更新本地缓存
 		basis.put(column, value);
 
-		//同步到数据库
 		if(connected){
 			saveColumnToTable(Obase.FAMILY_ATTR, column, value);
 		}
@@ -239,7 +218,6 @@ public abstract class RemoteBasic extends RemoteObject{
 	public void set(byte[][] columns, byte[][] data) throws ScriptException{
 		if(columns.length != data.length)throw new ScriptException("columns[] and datas[] dimension not match.");
 
-		//如果本地缓存中的数据有更新，同步更新表中的数据
 		int length = data.length;
 		List<byte[]> clist = new Vector<byte[]>();
 		List<byte[]> vlist = new Vector<byte[]>();
@@ -247,21 +225,17 @@ public abstract class RemoteBasic extends RemoteObject{
 			byte[] column = columns[i];
 			byte[] value = basis.get(column);
 
-			//什么都没改变
 			if(value != null && Bytes.equals(data[i], value))
 				continue;
 
 			value = data[i];
 
-			//更新本地缓存
 			basis.put(column, value);
 			clist.add(column);
 			vlist.add(value);
 		}
 
-		//同步到数据库
 		if(connected){
-			//保存数据
 			saveColumnToTable(Obase.FAMILY_ATTR, clist.toArray(new byte[0][0]), vlist.toArray(new byte[0][0]));
 
 			//update index
@@ -269,9 +243,6 @@ public abstract class RemoteBasic extends RemoteObject{
 	}
 
 	public byte[] get(byte[] column){
-//		if(!basis.containsKey(column))
-//			return null;
-
 		return basis.get(column);
 	}
 
@@ -305,7 +276,6 @@ public abstract class RemoteBasic extends RemoteObject{
 
 
 	private void saveColumnToTable(String family, byte[] column, byte[] v){
-		//如果在服务器
 		if(row == null)return;
 
 		Put put = new Put(this.getRow());
@@ -316,7 +286,7 @@ public abstract class RemoteBasic extends RemoteObject{
 			timestamp = Math.max(timestamp, put.getTimestamp());
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 		}
 	}
 
@@ -339,7 +309,7 @@ public abstract class RemoteBasic extends RemoteObject{
 			timestamp = Math.max(timestamp, put.getTimestamp());
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 		}
 	}
 
@@ -355,7 +325,7 @@ public abstract class RemoteBasic extends RemoteObject{
 			timestamp = Math.max(timestamp, del.getTimestamp());
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 		}
 	}
 	private void deleteColumnFromTable(String family, byte[][] columns) {
@@ -375,7 +345,7 @@ public abstract class RemoteBasic extends RemoteObject{
 			timestamp = Math.max(timestamp, del.getTimestamp());
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Hbase访问出错，请检测Hbase集群是否正常", e);
+			throw new RuntimeException("Hbase access failed. Please check the HBase connection.", e);
 		}
 	}
 }

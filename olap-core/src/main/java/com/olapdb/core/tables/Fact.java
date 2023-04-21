@@ -88,7 +88,7 @@ public class Fact extends Entity {
             HorizontalFactScanner horizontalFactScanner = new HorizontalFactScanner(scanners);
             return StreamSupport.stream(Spliterators.spliteratorUnknownSize(horizontalFactScanner, 0), false);
         }catch (Exception e){
-            log.error("创建Fact多分区并行扫描失败", e);
+            log.error("create scan failed", e);
             return null;
         }
     }

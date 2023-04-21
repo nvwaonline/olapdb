@@ -34,7 +34,7 @@ public abstract class Entity extends RemoteBasic {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	//索引操作 Simple Attributes
+	//Simple Attributes
 	//////////////////////////////////////////////////////////////////////////////
 	protected void addIndex(String column, Value value){
 		addIndex(column, value, null);
@@ -59,13 +59,8 @@ public abstract class Entity extends RemoteBasic {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	//简单属性 Simple Attributes
+	//Simple Attributes
 	//////////////////////////////////////////////////////////////////////////////
-	/**
-	 * 获取单个属性字段
-	 * @param name
-	 * @return
-	 */
 	public byte[] getAttribute(String name){
 		return this.get(Bytes.toBytes(name));
 	}
@@ -136,20 +131,10 @@ public abstract class Entity extends RemoteBasic {
 		return new Timestamp(this.getAttributeAsLong(name));
 	}
 
-	/**
-	 * 获取单个属性字段
-	 * @param name
-	 * @param value
-	 */
 	public void setAttribute(String name, byte[] value){
 		this.set(Bytes.toBytes(name) , value);
 	}
 
-	/**
-	 * 批量设置属性字段
-	 * @param name
-	 * @param value
-	 */
 	public void setAttributes(String[] name, byte[][] value){
 		try {
 			byte[][] columns = new byte[name.length][];
@@ -163,10 +148,6 @@ public abstract class Entity extends RemoteBasic {
 		}
 	}
 
-	/**
-	 * 删除单个属性字段
-	 * @param name
-	 */
 	public void deleteAttribute(String name){
 		try {
 			this.delete(Bytes.toBytes(name));
@@ -176,10 +157,6 @@ public abstract class Entity extends RemoteBasic {
 		}
 	}
 
-	/**
-	 * 批量删除属性字段
-	 * @param names
-	 */
 	public void deleteAttributes(List<String> names){
 		try {
 			byte[][] columns = new byte[names.size()][];
@@ -206,11 +183,6 @@ public abstract class Entity extends RemoteBasic {
 		this.deleteAttributes(name, items);
 	}
 
-	/**
-	 * 用于收集单个属性更新，这个操作不同于collect() 不会设置entity状态为connected.
-	 * @param name
-	 * @return
-	 */
 	public Put collectAttribute(String name){
 		return this.collect(Bytes.toBytes(name));
 	}
@@ -219,15 +191,8 @@ public abstract class Entity extends RemoteBasic {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	//数组属性 Array Attributes
+	//Array Attributes
 	//////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * 获取单个属性字段
-	 * @param name
-	 * @param item
-	 * @return
-	 */
 	public byte[] getAttribute(String name, String item){
 		return this.get(Bytes.toBytes(name+":"+item));
 	}
@@ -288,22 +253,10 @@ public abstract class Entity extends RemoteBasic {
 		else
 			return Bytez.toFloat(bytes);
 	}
-	/**
-	 * 获取单个属性字段
-	 * @param name
-	 * @param item
-	 * @param value
-	 */
 	public void setAttribute(String name, String item, byte[] value){
 		this.set(Bytes.toBytes(name+":"+item) , value);
 	}
 
-	/**
-	 * 批量设置属性字段
-	 * @param name
-	 * @param item
-	 * @param value
-	 */
 	public void setAttribute(String name, String[] item, byte[][] value){
 		try {
 			byte[][] columns = new byte[item.length][];
@@ -317,11 +270,6 @@ public abstract class Entity extends RemoteBasic {
 		}
 	}
 
-	/**
-	 * 删除单个属性字段
-	 * @param name
-	 * @param item
-	 */
 	public void deleteAttribute(String name, String item){
 		try {
 			this.delete(Bytes.toBytes(name+":"+item));
@@ -331,10 +279,6 @@ public abstract class Entity extends RemoteBasic {
 		}
 	}
 
-	/**
-	 * 获取单个属性的所有子项名称
-	 * @return
-	 */
 	public List<String> getAttributeItems(String name){
 		String prefix = name+":";
 		int pos = prefix.length();
@@ -346,11 +290,6 @@ public abstract class Entity extends RemoteBasic {
 				.collect(Collectors.toList());
 	}
 
-	/**
-	 * 流式访问
-	 * @param table
-	 * @return
-	 */
 	public static Stream<Result> stream(Class entityClass){
 		return stream(entityClass, new Scan());
 	}
@@ -369,13 +308,6 @@ public abstract class Entity extends RemoteBasic {
 		}
 	}
 
-    /**
-     * 并行扫描流，副作用是可能导致返回结果乱序
-     * @param entityClass
-     * @param scan
-     * @param threads
-     * @return
-     */
 	public static Stream<Result> multiScanStream(Class entityClass, Scan scan, int threads){
 		try{
 			ResultScanner rs = new ParallelScanner(entityClass, scan, threads);
@@ -385,12 +317,6 @@ public abstract class Entity extends RemoteBasic {
 		}
 	}
 
-	/**
-	 * 得到给定行健后的第一个记录
-	 * @param entityClass
-	 * @param row
-	 * @return
-	 */
 	public static Optional<Result> next(Class entityClass, byte[] row){
 		Scan scan = new Scan();
 		if(row!=null){
@@ -402,12 +328,6 @@ public abstract class Entity extends RemoteBasic {
 		return stream(entityClass, scan).findFirst();
 	}
 
-	/**
-	 * 得到给定行健前的第一个记录
-	 * @param entityClass
-	 * @param row
-	 * @return
-	 */
 	public static Optional<Result> before(Class entityClass, byte[] row){
 		Scan scan = new Scan().withStopRow(row);
 		scan.setOneRowLimit();
@@ -416,11 +336,6 @@ public abstract class Entity extends RemoteBasic {
 		return stream(entityClass, scan).findFirst();
 	}
 
-	/**
-	 * 扫描表的行数
-	 * @param table
-	 * @return
-	 */
 	public static long scanRowCount(Class entityClass){
 		Scan scan = new Scan();
 		FirstKeyOnlyFilter fkof = new FirstKeyOnlyFilter();

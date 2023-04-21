@@ -191,16 +191,10 @@ public class Indexer {
 		}
 	}
 
-
-	/**
-	 * 所有自动分配的Idc都具有>=1的id，为0的ID刚好作为表名索引。
-	 */
 	private static Idx tableRowCounter(Table table){
 		return new Idx(Bytez.add(Bytez.from((int)0), table.getName().toBytes()));
 	}
 
-
-	//得到索引词语在一个对象中出现的次数
 	public int getIndexCount(byte[] row, String column, Value value) throws Exception{
 		if(!checkIndex(row, column, value))
 			return 0;
@@ -216,14 +210,6 @@ public class Indexer {
 		return Bytez.toInt(index.getData());
 	}
 
-	/**
-	 * 获取索引的附加数据
-	 * @param row
-	 * @param column
-	 * @param value
-	 * @return
-	 * @throws Exception
-	 */
 	public byte[] getIndexData(byte[] row, String column, Value value) throws Exception{
 		if(!checkIndex(row, column, value))
 			return null;
@@ -238,13 +224,7 @@ public class Indexer {
 
 		return index.getData();
 	}
-	/**
-	 * 设置索引的附加数据
-	 * @param row
-	 * @param column
-	 * @param value
-	 * @param data
-	 */
+
 	public void setIndexData(byte[] row, String column, Value value, byte[] data){
 		if(!checkIndex(row, column, value))
 			return;
@@ -276,12 +256,6 @@ public class Indexer {
 		}
 	}
 
-	/**
-	 * 添加搜索标签
-	 * @param column
-	 * @param value
-	 * @return
-	 */
 	public Indexer addTag(String column, Value value){
 		if(value == null || value.equals(""))
 			return this;
@@ -296,13 +270,6 @@ public class Indexer {
 		return this;
 	}
 
-	/**
-	 * 添加搜索范围
-	 * @param column
-	 * @param start
-	 * @param stop
-	 * @return
-	 */
 	public Indexer addScope(String column, Value start, Value stop){
 		if(start == null || stop==null)
 			return this;
@@ -317,25 +284,10 @@ public class Indexer {
 		return this;
 	}
 
-	/**
-	 * 添加索引
-	 * @param row
-	 * @param column
-	 * @param value
-	 * @return
-	 */
 	public Indexer addIndex(byte[] row, String column, Value value){
 		return addIndex(row, column, value, null);
 	}
 
-	/**
-	 * 调整文档中某个标签的次数
-	 * @param row
-	 * @param column
-	 * @param value
-	 * @param count
-	 * @return
-	 */
 	public Indexer adjustIndex(byte[] row, String column, Value value, int count){
 		//		if(!checkIndex(row, column, value))
 		//			return this;
@@ -366,27 +318,12 @@ public class Indexer {
 		return this;
 	}
 
-	/**
-	 * 根据索引查询某列等于某值的所有记录的行键
-	 * @param entityClass
-	 * @param column
-	 * @param value
-	 * @return
-	 */
 	public static Stream<IndexData> find(Class entityClass, String column, Value value){
 		Idc idc= Idc.getInstance(Obase.getTable(entityClass), column);
 		Idx idx = new Idx(idc, value);
 		return idx.stream();
 	}
 
-	/**
-	 * 根据索引查询某列值处于某一范围内的所有记录的行键
-	 * @param entityClass
-	 * @param column
-	 * @param start
-	 * @param stop
-	 * @return
-	 */
 	public static Stream<IndexData> find(Class entityClass, String column, Value start, Value stop){
 		Idc idc= Idc.getInstance(Obase.getTable(entityClass), column);
 		Scan scan = new Scan().withStartRow(new Idx(idc, start).getRow()).withStopRow(new Idx(idc, stop).getRow());
@@ -402,14 +339,6 @@ public class Indexer {
                 e.getData()));
 	}
 
-	/**
-	 * 添加索引
-	 * @param row 行
-	 * @param column 列
-	 * @param value 值
-	 * @param data 附加数据
-	 * @return
-	 */
 	public Indexer addIndex(byte[] row, String column, Value value, byte[] data){
 		if(!checkIndex(row, column, value))
 			return this;
@@ -435,13 +364,6 @@ public class Indexer {
 		return this;
 	}
 
-	/**
-	 * 移除索引
-	 * @param row
-	 * @param column
-	 * @param value
-	 * @return
-	 */
 	public Indexer removeIndex(byte[] row, String column, Value value){
 		if(!checkIndex(row, column, value))
 			return this;
@@ -457,10 +379,6 @@ public class Indexer {
 		return this;
 	}
 
-	/**
-	 * 索引，相当于搜索
-	 * @return 匹配的行集合
-	 */
 	public List<Elite> list(){
 		submit();
 
@@ -545,10 +463,6 @@ public class Indexer {
 		return rets;
 	}
 
-	/**
-	 * 提交索引
-	 * 不存在的索引需要添加，存在的覆盖
-	 */
 	public void submit(){
 	}
 

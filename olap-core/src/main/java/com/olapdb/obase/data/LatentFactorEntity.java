@@ -12,10 +12,6 @@ public abstract class LatentFactorEntity extends RecommendEntity{
 		super(row);
 	}
 
-	/**
-	 * 潜在因子个数
-	 * @return
-	 */
 	public int getLatentFactorCount(){
 		byte[] bytes = this.getAttribute("latentFactorCount");
 		if(bytes == null)
@@ -28,10 +24,6 @@ public abstract class LatentFactorEntity extends RecommendEntity{
 		this.setAttribute("latentFactorCount", Bytes.toBytes(count));
 	}
 
-	/**
-	 * 读取潜在因子向量
-	 * @return
-	 */
 	public double[] getLatentFactors() {
 		int count = this.getLatentFactorCount();
 		double[] ret = new double[count];
@@ -61,10 +53,6 @@ public abstract class LatentFactorEntity extends RecommendEntity{
 		return ret;
 	}
 
-	/**
-	 * 设置潜在因子向量
-	 * @param values
-	 */
 	public void setLatentFactors(double[] values){
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);

@@ -37,13 +37,10 @@ public class Lunnar {
 		executer.submit(job);
 	}
 
-	/**
-	 * 默认调用，最多等待10分钟
-	 */
 	public void waitForComplete(){
 		executer.shutdown();
 
-		try {//等待直到所有任务完成
+		try {
 			executer.awaitTermination(10, TimeUnit.HOURS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -53,7 +50,7 @@ public class Lunnar {
 	public void waitForComplete(long time, TimeUnit timeUnit){
 		executer.shutdown();
 
-		try {//等待直到所有任务完成
+		try {
 			executer.awaitTermination(time, timeUnit);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
