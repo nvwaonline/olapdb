@@ -207,7 +207,8 @@ public class Olap {
     public static void deleteFacts(String factName){
         log.info("delete FACT data {}.......................", factName);
         AtomicLong counter = new AtomicLong(0);
-        //清空原有Fact
+
+        //Clear existing Fact
         List<Fact> deleteSet = new Vector<>();
         Fact.stream(factName, 0, Long.MAX_VALUE).forEach(e -> {
             deleteSet.add(e);
