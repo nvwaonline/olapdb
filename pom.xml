@@ -13,7 +13,7 @@
     <groupId>com.olapdb</groupId>
     <artifactId>olapdb</artifactId>
     <packaging>pom</packaging>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <name>OlapDB</name>
     <description>OlapDB is an OLAP data warehouse tool based on Cube pre-computation technology and HBase implementation, which can provide efficient real-time analysis and fast query for ultra-large-scale and ultra-fast-growing data. </description>
     <url>http://www.olapdb.com/</url>
@@ -37,7 +37,7 @@
     </scm>
 
     <properties>
-        <olap.version>1.0</olap.version>
+        <olap.version>1.0.1</olap.version>
     </properties>
 
     <modules>
