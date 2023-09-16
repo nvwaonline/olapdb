@@ -16,6 +16,7 @@ public class TimeUtil {
     private final static SimpleDateFormat SimpleDateFormat23 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private final static SimpleDateFormat simpleDateFormat23 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private final static SimpleDateFormat simpleDateFormat19 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final static SimpleDateFormat simpleDateFormat10 = new SimpleDateFormat("yyyy-MM-dd");
     private final static List<String> OlapTimeSeperate = Arrays.asList("-", "-", " ", ":", ":", ".", "");
 
     public static List<String> time2segs(Date date)
@@ -47,9 +48,13 @@ public class TimeUtil {
                         date = simpleDateFormat23.parse(timeInfo);
                     }
                 }
-                else {
+                else if(timeInfo.length() == 19) {
                     synchronized (simpleDateFormat19) {
                         date = simpleDateFormat19.parse(timeInfo);
+                    }
+                }else{
+                    synchronized (simpleDateFormat10) {
+                        date = simpleDateFormat10.parse(timeInfo);
                     }
                 }
                 synchronized (youngestDataTime) {
