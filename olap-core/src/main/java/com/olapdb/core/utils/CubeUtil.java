@@ -65,7 +65,7 @@ public class CubeUtil {
     }
 
     public static String cubeNameFromIdenticalName(String identicalName){
-        return identicalName.substring(0, identicalName.indexOf('-'));
+        return identicalName.substring(0, identicalName.lastIndexOf('-'));
     }
 
     public static void optimizeInheritedRelation(Cube cube, List<Cuboid> cuboids){

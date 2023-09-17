@@ -37,7 +37,7 @@
     </scm>
 
     <properties>
-        <olap.version>1.0.1</olap.version>
+        <olap.version>1.0.2</olap.version>
     </properties>
 
     <modules>
